@@ -2,6 +2,7 @@ extends Node2D
 
 
 const COLLISION_MASK = 1
+const COLLISION_MASK_SLOT = 2
 
 var selected_card = null
 var off_set_x = -1
@@ -37,6 +38,22 @@ func _raycast_check_for_card():
 		return card.collider.get_parent()
 	return null
 
+func _raycast_check_for_card_slot():
+	var space_state = get_world_2d().direct_space_state
+	var parameters = PhysicsPointQueryParameters2D.new()
+	parameters.position = get_global_mouse_position()
+	parameters.collide_with_areas = true
+	parameters.collision_mask = COLLISION_MASK_SLOT
+	var res = space_state.intersect_point(parameters)
+	
+	if res.size() > 0:
+		var slot_res = highest_z_card(res)
+		var slot_node = slot_res.collider.get_parent()
+		# On affiche le nom du Node du slot, pas un 'card_name' inexistant
+		print("Slot sélectionné : " + slot_node.name)
+		return slot_node
+	return null
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	screen_size = get_viewport_rect().size
@@ -54,7 +71,6 @@ func connect_card_signals(card):
 	card.set_meta("base_scale", card.scale)
 	card.connect("hovered", _on_card_hovered)
 	card.connect("unhovered", _on_card_unhovered)
-
 
 func highest_z_card(cards):
 	print("Cards under mouse: ", cards)
@@ -83,14 +99,22 @@ func start_drag(card):
 
 func undrag_card():
 	if selected_card != null:
-		# Reset visual state of the dropped card
-		highlight_card(selected_card, true, 1.1) # Back to hover scale if still hovering
+		var dropped_card = selected_card 
+		
+		highlight_card(dropped_card, true, 1.1)
 		selected_card = null
 		
-		# Check if we dropped it directly on top of another card to trigger hover
 		var card_under_mouse = _raycast_check_for_card()
 		if card_under_mouse != null:
 			_on_card_hovered(card_under_mouse)
+			
+		var card_slot_found = _raycast_check_for_card_slot()
+		if card_slot_found and not card_slot_found.card_in_slot:
+			dropped_card.global_position = card_slot_found.global_position
+			
+			card_slot_found.get_node("Area2D/CollisionShape2D").set_deferred("disabled", true)
+			card_slot_found.card_in_slot = true
+			dropped_card.get_node("Area2D/CollisionShape2D").set_deferred("disabled", true)
 
 func _on_card_hovered(card):
 	# Ignore hover logic if a card is currently being dragged
@@ -116,6 +140,7 @@ func _on_card_unhovered(card):
 		highlight_card(hovering_card, true)
 	else:
 		hovering_card = null
+
 func highlight_card(card, hovered, scale_factor = 1.1):
 	if hovered:
 		card.scale = card.get_meta("base_scale", Vector2(1, 1)) * scale_factor
