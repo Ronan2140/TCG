@@ -65,7 +65,7 @@ extends Area2D
 signal hovered
 signal unhovered
 
-	
+
 func _ready():
 	update_card_visuals()
 	# Execute the manager logic only if the game is actually running, not in the editor
