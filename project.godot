@@ -11,9 +11,14 @@ config_version=5
 [application]
 
 config/name="CardGame"
-run/main_scene="uid://dhy56yui58lwn"
+run/main_scene="uid://gacgkxl2762o"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+CardDatabase="*uid://cr3cru0tbmrpk"
+PlayerData="*uid://5mi1m6pqypc4"
 
 [display]
 
