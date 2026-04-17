@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://ddmv0lnp8tkpd"]
+
+[ext_resource type="Script" uid="uid://djuposq8ujbvs" path="res://CardSlot.gd" id="1_vwcyy"]
+[ext_resource type="Texture2D" uid="uid://borayx0tp1jgx" path="res://Cartes/Slots/Slot_unite.png" id="2_uk74p"]
+
+[node name="CardSlot" type="Control" unique_id=2081405792]
+z_index = -1
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -84.0
+offset_right = 60.0
+offset_bottom = 84.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(60, 84)
+mouse_filter = 1
+script = ExtResource("1_vwcyy")
+
+[node name="CardSlotImage" type="NinePatchRect" parent="." unique_id=1614135905]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -84.0
+offset_right = 60.0
+offset_bottom = 84.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_uk74p")
+
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

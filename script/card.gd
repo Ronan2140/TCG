@@ -3,6 +3,8 @@ extends Control
 
 signal left_clicked(card_node)
 signal right_clicked(card_node)
+signal hovered(card_node)
+signal unhovered(card_node)
 
 @export_group("Card Identity")
 @export var card_name: String = "Nom de la carte":
@@ -63,17 +65,14 @@ signal right_clicked(card_node)
 
 
 @onready var name_label = $UI/Titre
-@onready var desc_label = $UI/Description
-@onready var specifity_label = $UI/Spec
+@onready var desc_label = $UI/Panel/Description
+@onready var specifity_label = $UI/Panel/Spec
 @onready var art_sprite = $Illustration_rounded/Illustration
-@onready var atk_label = $UI/ATK
-@onready var atk_icon_sprite = $UI/ATTACK_ICON
-@onready var pm_label = $UI/PM
-@onready var slots_label = $UI/SLOTS
-@onready var hp_label = $UI/PV
-
-signal hovered
-signal unhovered
+@onready var atk_label = $UI/Panel/ATK
+@onready var atk_icon_sprite = $UI/Panel/ATTACK_ICON
+@onready var pm_label = $UI/Panel/PM
+@onready var slots_label = $UI/Panel/SLOTS
+@onready var hp_label = $UI/Panel/PV
 
 
 func _ready():
@@ -119,13 +118,6 @@ func setup_with_data(data: CardData):
 	update_card_visuals()
 
 	
-func _on_area_2d_mouse_exited() -> void:
-	emit_signal("unhovered", self )
-
-func _on_area_2d_mouse_entered() -> void:
-	emit_signal("hovered", self )
-
-
 func _on_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
@@ -134,3 +126,10 @@ func _on_gui_input(event: InputEvent) -> void:
 			elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 				accept_event()
 				right_clicked.emit(self )
+
+func _on_mouse_entered() -> void:
+	emit_signal("hovered", self )
+
+
+func _on_mouse_exited() -> void:
+	emit_signal("unhovered", self )

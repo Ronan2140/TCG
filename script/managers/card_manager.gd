@@ -1,172 +1,181 @@
 extends Node2D
 
-
-const COLLISION_MASK = 1
-const card_scene = preload("res://scenes/Card.tscn")
-const COLLISION_MASK_SLOT = 2
+const card_scene = preload("res://prefab/Card.tscn")
 
 var selected_card = null
-var off_set_x = -1
-var off_set_y = -1
-var screen_size = Vector2(0, 0)
+var off_set_x = 0.0
+var off_set_y = 0.0
+var screen_size = Vector2.ZERO
 var hovering_card = null
+var current_hovered_slot = null
 
-func _input(event):
-	if event is InputEventMouseButton and event.get_button_index() == MOUSE_BUTTON_LEFT:
-		if event.is_pressed():
-			selected_card = _raycast_check_for_card()
-			if selected_card:
-				start_drag(selected_card)
-		else:
-			undrag_card()
-
-func _raycast_check_for_card():
-	var space_state = get_world_2d().direct_space_state
-	var parameters = PhysicsPointQueryParameters2D.new()
-	parameters.position = get_global_mouse_position()
-	parameters.collide_with_areas = true
-	parameters.collision_mask = COLLISION_MASK
-	var res = space_state.intersect_point(parameters)
-	# get center of the card
-	
-	if res.size() > 0:
-		var card = highest_z_card(res)
-		# var card_center = card.collider.get_parent().global_position
-		# # get offset between mouse and card center
-		# off_set_x = card_center.x - get_global_mouse_position().x
-		# off_set_y = card_center.y - get_global_mouse_position().y
-		print("Card selected: " + card.collider.get_parent().card_name)
-		return card.collider.get_parent()
-	return null
-
-func _raycast_check_for_card_slot():
-	var space_state = get_world_2d().direct_space_state
-	var parameters = PhysicsPointQueryParameters2D.new()
-	parameters.position = get_global_mouse_position()
-	parameters.collide_with_areas = true
-	parameters.collision_mask = COLLISION_MASK_SLOT
-	var res = space_state.intersect_point(parameters)
-	
-	if res.size() > 0:
-		var slot_res = highest_z_card(res)
-		var slot_node = slot_res.collider.get_parent()
-		# On affiche le nom du Node du slot, pas un 'card_name' inexistant
-		print("Slot sélectionné : " + slot_node.name)
-		return slot_node
-	return null
-
-# Called when the node enters the scene tree for the first time.
+# region _ready and _process
 func _ready() -> void:
 	screen_size = get_viewport_rect().size
-	print(CardDatabase.data.get(1))
-	
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+	update_card_connections()
+
+func _process(_delta: float) -> void:
 	if selected_card != null:
 		var new_position = get_global_mouse_position() + Vector2(off_set_x, off_set_y)
 		selected_card.global_position = new_position
+		
+		var hovered_control = get_viewport().gui_get_hovered_control()
+		var valid_slot = null
+		
+		if hovered_control and "card_in_slot" in hovered_control and not hovered_control.card_in_slot:
+			valid_slot = hovered_control
+			
+		if valid_slot != current_hovered_slot:
+			if current_hovered_slot != null:
+				# Reset visual for the previous slot
+				current_hovered_slot.modulate = Color(1, 1, 1)
+				
+			current_hovered_slot = valid_slot
+			
+			if current_hovered_slot != null:
+				# Highlight the new slot
+				current_hovered_slot.modulate = Color(1.5, 1.5, 1.5)
 
-	
+func _input(event):
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if not event.is_pressed() and selected_card != null:
+			undrag_card()
+
+func update_card_connections():
+	for child in get_children():
+		if child is Control and child.has_signal("hovered"):
+			connect_card_signals(child)
+
 func connect_card_signals(card):
-	print("Connecting signals for card: " + card.card_name)
+	if card.hovered.is_connected(_on_card_hovered):
+		card.hovered.disconnect(_on_card_hovered)
+	if card.unhovered.is_connected(_on_card_unhovered):
+		card.unhovered.disconnect(_on_card_unhovered)
+	if card.left_clicked.is_connected(start_drag):
+		card.left_clicked.disconnect(start_drag)
+
+	print("Connecting signals for card: ", card.name)
 	card.set_meta("base_scale", card.scale)
-	card.connect("hovered", _on_card_hovered)
-	card.connect("unhovered", _on_card_unhovered)
+	
+	card.hovered.connect(_on_card_hovered)
+	card.unhovered.connect(_on_card_unhovered)
+	card.left_clicked.connect(start_drag)
 
-func highest_z_card(cards):
-	print("Cards under mouse: ", cards)
-	var highest_card = null
-	var highest_z = -1
-	for card in cards:
-		var collider = card.collider.get_parent()
-		if collider != null and "z_index" in collider:
-			if collider.z_index > highest_z:
-				highest_z = collider.z_index
-				highest_card = card
-	return highest_card
+	if not card.get_meta("exit_connected", false):
+		card.tree_exiting.connect(_on_card_tree_exiting.bind(card))
+		card.set_meta("exit_connected", true)
 
-# DEPLACEMENT DE CARTES
+# endregion
+
+
+# region Card interactions
 
 func start_drag(card):
 	selected_card = card
 	var card_center = card.global_position
 	off_set_x = card_center.x - get_global_mouse_position().x
 	off_set_y = card_center.y - get_global_mouse_position().y
+	release_card_slot(card)
 	
-	# Force maximum z_index while dragging to prevent overlap issues
+	set_card_mouse_filter_recursive(card, Control.MOUSE_FILTER_IGNORE, Control.MOUSE_FILTER_IGNORE)
+	print("Mouse filter set to IGNORE for card: ", card.name)
 	card.z_index = 100
-	print("Card selected: " + card.card_name)
-	highlight_card(card, true, 1.2) # Slightly larger when dragging
+	print("Card selected: ", card.name)
+	highlight_card(card, true, 1.2)
 
 func undrag_card():
-	if selected_card != null:
-		var dropped_card = selected_card
+	var dropped_card = selected_card
+	selected_card = null
+	off_set_x = 0
+	off_set_y = 0
+	
+	set_card_mouse_filter_recursive(dropped_card, Control.MOUSE_FILTER_STOP, Control.MOUSE_FILTER_PASS)
+	highlight_card(dropped_card, false)
+	
+	if current_hovered_slot != null:
+		dropped_card.global_position = current_hovered_slot.global_position
+		assign_card_to_slot(dropped_card, current_hovered_slot)
 		
-		highlight_card(dropped_card, true, 1.1)
-		selected_card = null
-		off_set_x = -1
-		off_set_y = -1
-		
-		var card_under_mouse = _raycast_check_for_card()
-		if card_under_mouse != null:
-			_on_card_hovered(card_under_mouse)
-			
-		var card_slot_found = _raycast_check_for_card_slot()
-		if card_slot_found and not card_slot_found.card_in_slot:
-			dropped_card.global_position = card_slot_found.global_position
-			
-			card_slot_found.get_node("Area2D/CollisionShape2D").set_deferred("disabled", true)
-			card_slot_found.card_in_slot = true
-			dropped_card.get_node("Area2D/CollisionShape2D").set_deferred("disabled", true)
+		# Reset visual state of the slot and clear the variable
+		print("Carte déposée dans : ", current_hovered_slot.name)
+		current_hovered_slot = null
+		return
 
+	print("Carte relâchée hors d'un slot disponible.")
 
 func _on_card_hovered(card):
-	# Ignore hover logic if a card is currently being dragged
 	if selected_card != null and selected_card != card:
 		return
 		
-	if (hovering_card == null):
+	if hovering_card == null:
 		hovering_card = card
-		print("Card hovered: " + card.card_name)
+		print("Card hovered: ", card.name)
 		highlight_card(card, true)
 
 func _on_card_unhovered(card):
-	# Ignore hover logic if a card is currently being dragged
 	if selected_card != null:
 		return
 		
-	print("Card unhovered: " + card.card_name)
+	print("Card unhovered: ", card.name)
 	highlight_card(card, false)
-	var new_hovering_card = _raycast_check_for_card()
-	if new_hovering_card != null and new_hovering_card != card:
-		hovering_card = new_hovering_card
-		print("New card hovered: " + hovering_card.card_name)
-		highlight_card(hovering_card, true)
-	else:
+	
+	if hovering_card == card:
 		hovering_card = null
+		
+		var current_hover = get_viewport().gui_get_hovered_control()
+		if current_hover != null and current_hover.has_signal("hovered") and current_hover != card:
+			hovering_card = current_hover
+			print("New card hovered: ", hovering_card.name)
+			highlight_card(hovering_card, true)
 
 func highlight_card(card, hovered, scale_factor = 1.1):
 	if hovered:
 		card.scale = card.get_meta("base_scale", Vector2(1, 1)) * scale_factor
-		card.z_index = 10 # High enough to be on top
+		card.z_index = 10
 	else:
 		card.scale = card.get_meta("base_scale", Vector2(1, 1))
 		card.z_index = 0
 
+
+func assign_card_to_slot(card: Control, slot: Control) -> void:
+	release_card_slot(card)
+	slot.card_in_slot = true
+	slot.modulate = Color(1, 1, 1)
+	card.set_meta("assigned_slot", slot)
+
+
+func release_card_slot(card: Control) -> void:
+	var assigned_slot = card.get_meta("assigned_slot", null)
+	if assigned_slot != null and is_instance_valid(assigned_slot):
+		assigned_slot.card_in_slot = false
+		assigned_slot.modulate = Color(1, 1, 1)
+	card.set_meta("assigned_slot", null)
+
+
+func _on_card_tree_exiting(card: Control) -> void:
+	release_card_slot(card)
+
+
+func set_card_mouse_filter_recursive(node: Node, mouse_filter, children_filter: Control.MouseFilter) -> void:
+	if node is Control and mouse_filter != null:
+		node.mouse_filter = mouse_filter
+
+	for child in node.get_children():
+		if (child is Control):
+			child.mouse_filter = children_filter
+			set_card_mouse_filter_recursive(child, null, children_filter)
+
+# endregion
+
 func spawn_card(card_id: int, pos: Vector2):
-	# 1. On récupère les données dans l'Autoload
 	var data = CardDatabase.data.get(card_id)
-	
 	if data == null:
 		print("Erreur : La carte ", card_id, " n'existe pas dans la DB")
 		return
 
-	# 2. On instancie le prefab
 	var new_card = card_scene.instantiate()
-	
-	# 3. On lui donne ses données AVANT de l'ajouter à la scène
 	new_card.setup_with_data(data)
-	
-	# 4. On la place et on l'affiche
 	new_card.global_position = pos
 	add_child(new_card)
+	
+	connect_card_signals(new_card)

@@ -1,11 +1,11 @@
-[gd_scene format=3 uid="uid://n4yxckya2qrc"]
+[gd_scene format=3 uid="uid://dofnpsute4tau"]
 
-[ext_resource type="Script" uid="uid://bbfcy6nrkgn0t" path="res://script/managers/DeckBuilderManager.gd" id="1_d2r6f"]
-[ext_resource type="Script" uid="uid://df2n6jj8bmee0" path="res://script/library.gd" id="1_sgepa"]
-[ext_resource type="Script" uid="uid://dgln51f2x7fim" path="res://script/deckPresets.gd" id="3_i5u37"]
-[ext_resource type="Script" uid="uid://bvcw7unbrtorv" path="res://script/current_deck.gd" id="5_i5u37"]
-[ext_resource type="Texture2D" uid="uid://bcob1fq6vnl23" path="res://Cartes/Icons/save.svg" id="5_tk1rq"]
-[ext_resource type="Texture2D" uid="uid://c1cihwija53ok" path="res://Cartes/Icons/trash.svg" id="6_tk1rq"]
+[ext_resource type="Script" uid="uid://vm741toono3h" path="res://script/managers/DeckBuilderManager.gd" id="1_d2r6f"]
+[ext_resource type="Script" uid="uid://8lqp0r5thho2" path="res://script/library.gd" id="1_sgepa"]
+[ext_resource type="Script" uid="uid://cn5g1wb3b3sui" path="res://script/deckPresets.gd" id="3_i5u37"]
+[ext_resource type="Script" uid="uid://bt4pxo02dex7w" path="res://script/current_deck.gd" id="5_i5u37"]
+[ext_resource type="Texture2D" uid="uid://dxogxjkw3wdcw" path="res://Cartes/Icons/save.svg" id="5_tk1rq"]
+[ext_resource type="Texture2D" uid="uid://bug5dyjvsu00v" path="res://Cartes/Icons/trash.svg" id="6_tk1rq"]
 
 [node name="DeckBuilder" type="Control" unique_id=891704738]
 layout_mode = 3

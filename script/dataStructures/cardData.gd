@@ -13,6 +13,7 @@ var slots: int
 var spec: String
 var artwork: String
 
+
 # Le constructeur : il prend le dictionnaire du CSV et remplit l'objet
 func _init(dict: Dictionary):
 	id = dict.get("ID", 0)

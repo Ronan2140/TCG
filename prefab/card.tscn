@@ -1,0 +1,264 @@
+[gd_scene format=3 uid="uid://dt1yrlan4h7b8"]
+
+[ext_resource type="Script" uid="uid://olhqgosmrvcc" path="res://script/card.gd" id="1_6lcat"]
+[ext_resource type="FontFile" uid="uid://bcfjxn1gnj83k" path="res://fonts/Yu-Gi-Oh! Matrix Regular Small Caps 1.ttf" id="2_6lcat"]
+[ext_resource type="FontFile" uid="uid://d3jjpxf0gtpep" path="res://fonts/Yu-Gi-Oh! ITC Stone Serif Small Caps Bold.ttf" id="3_ut1v0"]
+[ext_resource type="FontFile" uid="uid://glnekaj8w5ii" path="res://fonts/Yu-Gi-Oh! ITC Stone Serif LT Italic.ttf" id="4_vno60"]
+[ext_resource type="Texture2D" uid="uid://un5eibogwefj" path="res://Cartes/Icons/step_white.svg" id="6_is7yf"]
+[ext_resource type="Texture2D" uid="uid://dhj2r7qsypbpj" path="res://Cartes/Icons/slots_white.svg" id="7_5biq5"]
+[ext_resource type="Texture2D" uid="uid://djv4f6svpoiik" path="res://Cartes/Icons/heart_white.svg" id="8_kicxe"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ig7tw"]
+bg_color = Color(0.5019608, 0.19215687, 0, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0xm2m"]
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6lcat"]
+bg_color = Color(0.11764706, 0.11764706, 0.11764706, 0.6627451)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="Card" type="Control" unique_id=701948681]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -84.0
+offset_right = 60.0
+offset_bottom = 84.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(60, 84)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("1_6lcat")
+
+[node name="Background" type="Panel" parent="." unique_id=1644265957]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_ig7tw")
+
+[node name="Illustration_rounded" type="Panel" parent="." unique_id=319305040]
+clip_children = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = -2.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_0xm2m")
+
+[node name="Illustration" type="TextureRect" parent="Illustration_rounded" unique_id=756233417]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+expand_mode = 1
+stretch_mode = 6
+
+[node name="UI" type="Control" parent="." unique_id=523425927]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="Panel" type="Panel" parent="UI" unique_id=784476588]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.5
+offset_top = -42.0
+offset_right = -2.5
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_6lcat")
+
+[node name="Spec" type="Label" parent="UI/Panel" unique_id=316851287]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 2.5
+offset_top = 2.5
+offset_right = -2.5
+offset_bottom = 7.5
+grow_horizontal = 2
+mouse_filter = 1
+theme_override_fonts/font = ExtResource("3_ut1v0")
+theme_override_font_sizes/font_size = 4
+text = "Spécifité..."
+
+[node name="Description" type="RichTextLabel" parent="UI/Panel" unique_id=244132579]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.5
+offset_top = 10.0
+offset_right = -2.5
+offset_bottom = -7.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme_override_fonts/normal_font = ExtResource("4_vno60")
+theme_override_fonts/italics_font = ExtResource("4_vno60")
+theme_override_font_sizes/normal_font_size = 3
+text = "Description des effets..."
+
+[node name="ATK" type="Label" parent="UI/Panel" unique_id=1780572561]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = -6.0
+offset_right = 16.0
+grow_vertical = 0
+mouse_filter = 1
+theme_override_fonts/font = ExtResource("2_6lcat")
+theme_override_font_sizes/font_size = 6
+text = "0"
+horizontal_alignment = 2
+
+[node name="PM" type="Label" parent="UI/Panel" unique_id=2004796572]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -13.5
+offset_top = -6.0
+offset_right = -9.5
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 1
+theme_override_fonts/font = ExtResource("2_6lcat")
+theme_override_font_sizes/font_size = 6
+text = "0"
+
+[node name="SLOTS" type="Label" parent="UI/Panel" unique_id=951636539]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -28.5
+offset_top = -6.0
+offset_right = -24.5
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 1
+theme_override_fonts/font = ExtResource("2_6lcat")
+theme_override_font_sizes/font_size = 6
+text = "0"
+
+[node name="PV" type="Label" parent="UI/Panel" unique_id=1454196783]
+layout_mode = 0
+offset_left = 83.5
+offset_top = 34.0
+offset_right = 97.5
+offset_bottom = 40.0
+mouse_filter = 1
+theme_override_fonts/font = ExtResource("2_6lcat")
+theme_override_font_sizes/font_size = 6
+horizontal_alignment = 2
+
+[node name="ATTACK_ICON" type="TextureRect" parent="UI/Panel" unique_id=2009678279]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 17.0
+offset_top = -8.0
+offset_right = 25.0
+grow_vertical = 0
+expand_mode = 1
+
+[node name="PM_icon" type="TextureRect" parent="UI/Panel" unique_id=266600349]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -8.5
+offset_top = -8.0
+offset_right = -0.5
+grow_horizontal = 2
+grow_vertical = 0
+texture = ExtResource("6_is7yf")
+expand_mode = 1
+
+[node name="SLOTS_icon" type="TextureRect" parent="UI/Panel" unique_id=251175472]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -23.5
+offset_top = -8.0
+offset_right = -15.5
+grow_horizontal = 2
+grow_vertical = 0
+texture = ExtResource("7_5biq5")
+expand_mode = 1
+
+[node name="HP_icon" type="TextureRect" parent="UI/Panel" unique_id=2111274313]
+layout_mode = 0
+offset_left = 97.5
+offset_top = 32.0
+offset_right = 105.5
+offset_bottom = 40.0
+texture = ExtResource("8_kicxe")
+expand_mode = 1
+
+[node name="Titre" type="Label" parent="UI" unique_id=1610427168]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 6.0
+offset_bottom = 18.0
+grow_horizontal = 2
+mouse_filter = 1
+theme_override_fonts/font = ExtResource("2_6lcat")
+theme_override_font_sizes/font_size = 12
+text = "Nom de la carte"
+horizontal_alignment = 1
+
+[connection signal="gui_input" from="." to="." method="_on_gui_input"]
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

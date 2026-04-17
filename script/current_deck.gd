@@ -4,7 +4,7 @@ extends GridContainer
 signal card_removed_from_deck(card_instance, card_id)
 
 @onready var library = %CollectionGrid
-var card_item_scene = preload("res://scenes/Card.tscn")
+var card_item_scene = preload("res://prefab/Card.tscn")
 
 @export var columns_count: int = 4
 
@@ -56,7 +56,7 @@ func _create_card_slot(id, w, h):
 	var card_node = card_item_scene.instantiate()
 	slot.add_child(card_node)
 	
-	var native_size = Vector2(250, 350)
+	var native_size = GameConfig.CARD_SIZE
 	card_node.scale = Vector2(w / native_size.x, h / native_size.y)
 	
 	var card_data = CardDatabase.get_card_data_by_id(id)

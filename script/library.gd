@@ -2,7 +2,7 @@ extends GridContainer
 signal card_added_to_deck(card_id)
 
 
-var card_item_scene = preload("res://scenes/Card.tscn")
+var card_item_scene = preload("res://prefab/Card.tscn")
 @export var columns_count: int = 4
 
 func populate_library(cards_to_show: Dictionary):
@@ -25,7 +25,7 @@ func populate_library(cards_to_show: Dictionary):
 		
 		var card_node = card_item_scene.instantiate()
 		slot.add_child(card_node)
-		var native_size = Vector2(250, 350)
+		var native_size = GameConfig.CARD_SIZE
 		card_node.scale = Vector2(responsive_width / native_size.x, responsive_height / native_size.y)
 		
 		if card_node.has_method("setup_with_data"):
