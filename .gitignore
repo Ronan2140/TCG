@@ -1,3 +1,15 @@
-# Godot 4+ specific ignores
+# Godot spécifique
 .godot/
-/android/
+*.tmp
+*.uid
+*.import
+*.depren
+
+# Binaires et installateurs
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Plugins Git (souvent inutiles à versionner si tu l'as déjà)
+addons/godot-git-plugin/

@@ -1,0 +1,155 @@
+[gd_scene format=3 uid="uid://n4yxckya2qrc"]
+
+[ext_resource type="Script" uid="uid://bbfcy6nrkgn0t" path="res://script/managers/DeckBuilderManager.gd" id="1_d2r6f"]
+[ext_resource type="Script" uid="uid://df2n6jj8bmee0" path="res://script/library.gd" id="1_sgepa"]
+[ext_resource type="Script" uid="uid://dgln51f2x7fim" path="res://script/deckPresets.gd" id="3_i5u37"]
+[ext_resource type="Script" uid="uid://bvcw7unbrtorv" path="res://script/current_deck.gd" id="5_i5u37"]
+[ext_resource type="Texture2D" uid="uid://bcob1fq6vnl23" path="res://Cartes/Icons/save.svg" id="5_tk1rq"]
+[ext_resource type="Texture2D" uid="uid://c1cihwija53ok" path="res://Cartes/Icons/trash.svg" id="6_tk1rq"]
+
+[node name="DeckBuilder" type="Control" unique_id=891704738]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_d2r6f")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=154208959]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.9524761, 0.7869732, 0.4641611, 0.7529412)
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1948404722]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=481709463]
+layout_mode = 2
+
+[node name="DeckCollectionMarginZone" type="MarginContainer" parent="MarginContainer/VBoxContainer" unique_id=921131083]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="DeckXCollectionZone" type="HBoxContainer" parent="MarginContainer/VBoxContainer/DeckCollectionMarginZone" unique_id=327012311]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="CollectionZone" type="VBoxContainer" parent="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone" unique_id=1159321534]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SearchCardZone" type="HBoxContainer" parent="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone/CollectionZone" unique_id=1799812826]
+layout_mode = 2
+
+[node name="SearchBar" type="LineEdit" parent="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone/CollectionZone/SearchCardZone" unique_id=700140201]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Rechercher une carte"
+
+[node name="Collection" type="ScrollContainer" parent="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone/CollectionZone" unique_id=479222933]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="CollectionGrid" type="GridContainer" parent="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone/CollectionZone/Collection" unique_id=1839391744]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+columns = 4
+script = ExtResource("1_sgepa")
+
+[node name="DeckZone" type="VBoxContainer" parent="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone" unique_id=1288774584]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DeckPresetsZone" type="ScrollContainer" parent="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone/DeckZone" unique_id=648066228]
+layout_mode = 2
+vertical_scroll_mode = 0
+
+[node name="DeckPresets" type="OptionButton" parent="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone/DeckZone/DeckPresetsZone" unique_id=219251905]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("3_i5u37")
+
+[node name="Deck" type="ScrollContainer" parent="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone/DeckZone" unique_id=670010443]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="DeckGrid" type="GridContainer" parent="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone/DeckZone/Deck" unique_id=1586212126]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+columns = 4
+script = ExtResource("5_i5u37")
+
+[node name="DeckSave" type="HBoxContainer" parent="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone/DeckZone" unique_id=194570473]
+layout_mode = 2
+
+[node name="DeckNameInput" type="LineEdit" parent="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone/DeckZone/DeckSave" unique_id=1525791808]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Nom du deck"
+
+[node name="SaveButton" type="Button" parent="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone/DeckZone/DeckSave" unique_id=1433099963]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+icon = ExtResource("5_tk1rq")
+expand_icon = true
+
+[node name="DeleteButton" type="Button" parent="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone/DeckZone/DeckSave" unique_id=1552798981]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+icon = ExtResource("6_tk1rq")
+expand_icon = true
+
+[node name="ErrorDialog" type="AcceptDialog" parent="." unique_id=2020039686]
+unique_name_in_owner = true
+oversampling_override = 1.0
+title = "Certainement pas"
+size = Vector2i(300, 100)
+dialog_text = "Un deck avec ce nom existe déjà ! "
+
+[node name="DeleteDialog" type="ConfirmationDialog" parent="." unique_id=208402437]
+unique_name_in_owner = true
+oversampling_override = 1.0
+title = "Supprimer ? "
+size = Vector2i(300, 100)
+ok_button_text = "OUI !"
+cancel_button_text = "NON ! "
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone/DeckZone/DeckSave/SaveButton" to="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone/DeckZone/DeckPresetsZone/DeckPresets" method="_on_save_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone/DeckZone/DeckSave/DeleteButton" to="MarginContainer/VBoxContainer/DeckCollectionMarginZone/DeckXCollectionZone/DeckZone/DeckPresetsZone/DeckPresets" method="_on_delete_button_pressed"]

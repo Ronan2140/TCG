@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://bkd710mr55rus"]
+
+[ext_resource type="Script" uid="uid://dgln51f2x7fim" path="res://script/deckPresets.gd" id="1_fc6qd"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l7tmi"]
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="preset_item" type="VBoxContainer" unique_id=998481669]
+offset_right = 250.0
+offset_bottom = 377.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_fc6qd")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1313669101]
+clip_children = 1
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_l7tmi")
+
+[node name="VBoxContainer" type="Button" parent="PanelContainer" unique_id=413657687]
+layout_mode = 2
+size_flags_vertical = 3
+text = "preset_id"
+
+[node name="Label" type="Label" parent="." unique_id=386305687]
+layout_mode = 2
+text = "deck_name"
+horizontal_alignment = 1

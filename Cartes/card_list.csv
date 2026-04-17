@@ -1,0 +1,27 @@
+ID,Nom carte,Categorie,Effet/description,Type,CATEGORIE ATK,ATK,PV,PM,Slots,Spécifité
+1,Champs,Terrain,Boost les troupes au Sol (+20 ATK),,,,500,,3,
+2,Village,Terrain,Permet de piocher un équipement quand une nouvelle troupe arrive sur le terrain une fois par tour,,,,500,,1,
+3,Volcan,Terrain,"Restaure 10 PV par tour aux troupes FEU, fait subir 10 dégats aux troupes non Feu à l'entrée sur le terrain",,,,500,,3,Feu
+4,Prairie,Terrain,-,,,,500,,4,
+5,Vatican,Terrain,Bloque toutes les cartes MAGIE,,,,500,,3,
+6,Fort Boyard,Terrain,Tous les batiments sur le terrain gagnent 30 PV,,,,500,,3,
+7,Grotte,Terrain,"Tous les monstres Vol passent au Sol, les attaques à distance ne sont pas possibles",,,,500,,,
+8,Marrécage,Terrain,"Les créatures qui nagent gagnent une catégorie d'attaque, 
+ celles qui ne nagent pas perdrent une catégories",,,,500,,5,Eau
+9,Boule de feu,Sort,Inflige 40 Dégats à une unité,,,,,,,Feu
+10,Le déluge,Sort,Désactive les effets des cartes FEU pendant 1 tour,,,,,,,"Météo, Eau"
+11,Contrôle mental,Sort,Permet de prendre le contrôle d'une unité adverse pendant 1 tour,,,,,,,Magie
+12,Foudre,Sort,"Enlève 80 PV à toutes les troupes Vol, Métal, et sur des Terrains Eau du plateau",,,,,,,Météo
+13,Feu de camp,Batiment,Restaure 20 PV aux troupes sur le même Terrain,,,,10,,,Feu
+14,Gros Rocher Magique,Batiment,"Se pose sur un Terrain Adverse, Annule l'effet du Terrain en question",,,,40,,,Magie
+15,Caserne,Batiment,Permet de piocher une unité par tour,,,,70,,,
+16,Guerrier,Unité,"Spécialisé dans les attaque à l'épée, ce guerrier n'a jamais perdu un combat",Sol - CaC,Normal,100,120,3,1,Métal
+17,Aigle,Unité,"Peut transformer un montre de Type Sol en Type Vol à la fois, 
+ si AIGLE meurt en transportant un personnage, celui-ci recoit 20 dégats.",Vol - CaC,Rapide,40,80,4,1,
+18,Archer,Unité,-,Sol - Distance,Rapide,40,90,2,1,
+19,Sorcier de feu,Unité,Peut bloquer 1 carte méteo,Sol - Distance,Puissant,120,110,2,,"Magie, Feu"
+20,Goliath,Unité,"Subit x1,5 dégâts des attaques rapides",Sol - CaC,Puissant,150,200,1,2,Géant
+21,Hache,Equipement,Ajoute 50 d'ATK à une unité CaC,-,-,-,,,,"Métal, Bois"
+22,Bouclier,Equipement,Ajoute 50 PV à l'unité choisie,-,-,-,,,,"Métal, Bois"
+23,Grimoire,Equipement,Ajoute 30 ATK à une unité Magie,-,-,-,,,,"Magie, Papier"
+24,Chien de Jade,Compagnon,Préviens une attaque rapide par tour,Sol - CaC,,20,40,,,
