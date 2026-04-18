@@ -1,18 +1,44 @@
 extends Node2D
 
 const card_scene = preload("res://prefab/Card.tscn")
-
+var MAX_HAND_WIDTH = 0
+var HAND_CENTER_X = 0
+var HAND_Y_hidden = 0
+var HAND_Y_shown = 0
+@onready var deck_zone = %DeckZone
 var selected_card = null
 var off_set_x = 0.0
 var off_set_y = 0.0
 var screen_size = Vector2.ZERO
 var hovering_card = null
 var current_hovered_slot = null
+var deck_pos = Vector2(100, 100)
+var hide_hand_delay_sec := 3.0
+var hand_hide_timer: Timer = null
+var is_hand_shown := false
+
 
 # region _ready and _process
 func _ready() -> void:
 	screen_size = get_viewport_rect().size
+	MAX_HAND_WIDTH = screen_size.x - 2 * GameConfig.CARD_SIZE.x - 40
+	HAND_CENTER_X = screen_size.x / 2
+	# position a moitié visible
+	HAND_Y_hidden = screen_size.y
+	HAND_Y_shown = screen_size.y - GameConfig.CARD_SIZE.y / 2 - 20
+
+	hand_hide_timer = Timer.new()
+	hand_hide_timer.one_shot = true
+	hand_hide_timer.wait_time = hide_hand_delay_sec
+	hand_hide_timer.timeout.connect(_on_hand_hide_timeout)
+	add_child(hand_hide_timer)
+
 	update_card_connections()
+	if deck_zone == null:
+		push_warning("DeckZone introuvable, utilisation de la position par defaut pour le draw.")
+	
+	# Load deck in PlayerData
+	load_deck(PlayerData.decks[PlayerData.selected_deck_index])
 
 func _process(_delta: float) -> void:
 	if selected_card != null:
@@ -82,6 +108,7 @@ func start_drag(card):
 	card.z_index = 100
 	print("Card selected: ", card.name)
 	highlight_card(card, true, 1.2)
+	_update_hand_hide_state()
 
 func undrag_card():
 	var dropped_card = selected_card
@@ -99,9 +126,12 @@ func undrag_card():
 		# Reset visual state of the slot and clear the variable
 		print("Carte déposée dans : ", current_hovered_slot.name)
 		current_hovered_slot = null
+		_update_hand_hide_state()
 		return
 
 	print("Carte relâchée hors d'un slot disponible.")
+	_organize_hand(HAND_Y_shown if is_hand_shown else HAND_Y_hidden)
+	_update_hand_hide_state()
 
 func _on_card_hovered(card):
 	if selected_card != null and selected_card != card:
@@ -111,14 +141,14 @@ func _on_card_hovered(card):
 		hovering_card = card
 		print("Card hovered: ", card.name)
 		highlight_card(card, true)
+	_update_hand_hide_state()
+
 
 func _on_card_unhovered(card):
 	if selected_card != null:
 		return
 		
 	print("Card unhovered: ", card.name)
-	highlight_card(card, false)
-	
 	if hovering_card == card:
 		hovering_card = null
 		
@@ -126,15 +156,51 @@ func _on_card_unhovered(card):
 		if current_hover != null and current_hover.has_signal("hovered") and current_hover != card:
 			hovering_card = current_hover
 			print("New card hovered: ", hovering_card.name)
+
+			
 			highlight_card(hovering_card, true)
 
+	highlight_card(card, false)
+	_update_hand_hide_state()
+
 func highlight_card(card, hovered, scale_factor = 1.1):
+	# Lock pivot offset exactly to the center to prevent visual shifting on scale
+	card.pivot_offset = Vector2(60, 84)
+
 	if hovered:
 		card.scale = card.get_meta("base_scale", Vector2(1, 1)) * scale_factor
 		card.z_index = 10
 	else:
 		card.scale = card.get_meta("base_scale", Vector2(1, 1))
 		card.z_index = 0
+
+
+func _update_hand_hide_state() -> void:
+	if selected_card != null or hovering_card != null:
+		_cancel_hand_hide_timer()
+		if not is_hand_shown:
+			show_hand()
+		return
+
+	_restart_hand_hide_timer()
+
+
+func _restart_hand_hide_timer() -> void:
+	if hand_hide_timer == null:
+		return
+	hand_hide_timer.stop()
+	hand_hide_timer.start()
+
+
+func _cancel_hand_hide_timer() -> void:
+	if hand_hide_timer == null:
+		return
+	hand_hide_timer.stop()
+
+
+func _on_hand_hide_timeout() -> void:
+	if selected_card == null and hovering_card == null:
+		hide_hand()
 
 
 func assign_card_to_slot(card: Control, slot: Control) -> void:
@@ -171,7 +237,7 @@ func spawn_card(card_id: int, pos: Vector2):
 	var data = CardDatabase.data.get(card_id)
 	if data == null:
 		print("Erreur : La carte ", card_id, " n'existe pas dans la DB")
-		return
+		return null
 
 	var new_card = card_scene.instantiate()
 	new_card.setup_with_data(data)
@@ -179,3 +245,82 @@ func spawn_card(card_id: int, pos: Vector2):
 	add_child(new_card)
 	
 	connect_card_signals(new_card)
+	return new_card
+
+
+# region Drawing and Hand
+
+var player_hand = []
+var player_deck = []
+
+func load_deck(deck_data: DeckData):
+	print("Loading deck: ", deck_data)
+	if deck_data == null or deck_data.card_ids.size() == 0:
+		print("Erreur : Aucun deck sélectionné ou le deck est invalide.")
+		player_deck = [16, 20, 16, 16, 17, 18, 18, 19, 20]
+		return
+	player_deck = deck_data.card_ids.duplicate()
+
+func draw_card():
+	var current_deck_pos = Vector2(100, 100)
+	if deck_zone != null:
+		current_deck_pos = deck_zone.global_position
+	print("Position du deck pour le draw: ", current_deck_pos)
+
+	if player_deck.is_empty():
+		print("Plus de cartes !")
+		return
+		
+	var card_id = player_deck.pop_front()
+	var card_instance = spawn_card(card_id, current_deck_pos)
+	
+	if card_instance != null:
+		player_hand.append(card_instance)
+		_organize_hand(HAND_Y_shown if is_hand_shown else HAND_Y_hidden)
+
+func _organize_hand(card_y = HAND_Y_hidden):
+	var count = player_hand.size()
+	if count == 0: return
+
+	var spacing = min(140, MAX_HAND_WIDTH / count)
+	
+	for i in range(count):
+		var card = player_hand[i]
+		
+		# Skip tweening for the dragged card
+		if card == selected_card:
+			continue
+		
+		var target_x = HAND_CENTER_X + (i - (count - 1) / 2.0) * spacing
+		var target_pos = Vector2(target_x, card_y)
+		var final_dest = target_pos - Vector2(60, 84)
+		
+		# Kill the existing tween to prevent conflicts and floating point drift
+		if card.has_meta("move_tween"):
+			var old_tween = card.get_meta("move_tween")
+			if old_tween and old_tween.is_valid():
+				old_tween.kill()
+		
+		# Create a new tween strictly bound to this card
+		var tween = card.create_tween()
+		card.set_meta("move_tween", tween)
+		
+		tween.tween_property(card, "position", final_dest, 0.4).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+
+		card.z_index = i
+
+		
+func _on_deck_zone_gui_input(event: InputEvent) -> void:
+	#  if left click
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
+		print("Deck clicked, drawing a card.", player_deck)
+		draw_card()
+
+
+func hide_hand():
+	is_hand_shown = false
+	_organize_hand(HAND_Y_hidden)
+
+func show_hand():
+	is_hand_shown = true
+	_organize_hand(HAND_Y_shown)

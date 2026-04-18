@@ -1,26 +1,101 @@
 [gd_scene format=3 uid="uid://dhy56yui58lwn"]
 
 [ext_resource type="Script" uid="uid://n0svedl6w1mm" path="res://script/managers/card_manager.gd" id="1_0xm2m"]
-[ext_resource type="PackedScene" uid="uid://dt1yrlan4h7b8" path="res://prefab/card.tscn" id="2_0xm2m"]
-[ext_resource type="PackedScene" uid="uid://ddmv0lnp8tkpd" path="res://prefab/card_slot.tscn" id="8_5vw27"]
+[ext_resource type="PackedScene" uid="uid://veke3y8t528c" path="res://prefab/deck.tscn" id="2_0xm2m"]
+
+[sub_resource type="Theme" id="Theme_0xm2m"]
 
 [node name="Main" type="Node2D" unique_id=1845196912]
 
-[node name="CardSlot" parent="." unique_id=2081405792 instance=ExtResource("8_5vw27")]
-offset_left = 426.0
-offset_top = 254.0
-offset_right = 546.0
-offset_bottom = 422.0
+[node name="MainUI" type="Control" parent="." unique_id=577435101]
+custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+mouse_filter = 2
+
+[node name="DiscardZone" type="Control" parent="MainUI" unique_id=1966967668]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = -172.0
+offset_right = 125.0
+offset_bottom = -4.0
+grow_vertical = 0
+
+[node name="Panel" type="Panel" parent="MainUI/DiscardZone" unique_id=355553178]
+clip_children = 1
+custom_minimum_size = Vector2(120, 168)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -84.0
+offset_right = 60.0
+offset_bottom = 84.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="ColorRect" parent="MainUI/DiscardZone/Panel" unique_id=1355902919]
+custom_minimum_size = Vector2(120, 168)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(60, 84)
+theme = SubResource("Theme_0xm2m")
+color = Color(0.09302468, 0.030407105, 0.09302468, 1)
+
+[node name="DeckZone" type="Control" parent="MainUI" unique_id=263489053]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -125.0
+offset_top = -173.0
+offset_right = -5.0
+offset_bottom = -5.0
+grow_horizontal = 0
+grow_vertical = 0
+pivot_offset = Vector2(60, 84)
+
+[node name="Deck" parent="MainUI/DeckZone" unique_id=749076287 instance=ExtResource("2_0xm2m")]
+layout_mode = 1
+
+[node name="Label" type="Label" parent="MainUI/DeckZone" unique_id=1783214837]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 21
+text = "Nb cartes"
 
 [node name="CardManager" type="Node2D" parent="." unique_id=1700692630]
 script = ExtResource("1_0xm2m")
-
-[node name="Card" parent="CardManager" unique_id=701948681 instance=ExtResource("2_0xm2m")]
-anchors_preset = 6
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = 232.0
-offset_top = 171.0
-offset_right = 352.0
-offset_bottom = 339.0
-grow_horizontal = 0

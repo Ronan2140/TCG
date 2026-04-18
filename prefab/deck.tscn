@@ -1,0 +1,65 @@
+[gd_scene format=3 uid="uid://veke3y8t528c"]
+
+[ext_resource type="Texture2D" uid="uid://bd3dtldxuurju" path="res://Cartes/Cartes/CardBack.png" id="1_0oq4e"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kwfvk"]
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="Deck" type="Control" unique_id=749076287]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -84.0
+offset_right = 60.0
+offset_bottom = 84.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(60, 84)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="DeckBack" type="Panel" parent="." unique_id=668476149]
+clip_children = 1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -84.0
+offset_right = 60.0
+offset_bottom = 84.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(60, 84)
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_kwfvk")
+metadata/_edit_use_anchors_ = true
+
+[node name="CarBack" type="TextureRect" parent="DeckBack" unique_id=567743400]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -84.0
+offset_right = 60.0
+offset_bottom = 84.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(60, 84)
+mouse_filter = 2
+texture = ExtResource("1_0oq4e")
+expand_mode = 1
+metadata/_edit_use_anchors_ = true

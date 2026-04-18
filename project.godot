@@ -20,12 +20,15 @@ config/icon="res://icon.svg"
 CardDatabase="*uid://c5xjj3at3pf7p"
 PlayerData="*uid://ds7lu4jn84a08"
 GameConfig="*uid://8wftvfkl13ml"
+ClickDebugger="*uid://cm8rvyqyk62cr"
 
 [display]
 
-window/size/initial_position_type=0
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/window_width_override=1280
+window/size/window_height_override=720
 window/stretch/mode="canvas_items"
-window/stretch/aspect="expand"
 window/vsync/vsync_mode=0
 
 [input_devices]
