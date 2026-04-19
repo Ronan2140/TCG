@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://n0svedl6w1mm" path="res://script/managers/card_manager.gd" id="1_ctivo"]
 [ext_resource type="PackedScene" uid="uid://veke3y8t528c" path="res://prefab/deck.tscn" id="2_ge6n4"]
+[ext_resource type="PackedScene" uid="uid://ddmv0lnp8tkpd" path="res://prefab/card_slot.tscn" id="2_he1p1"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nh46d"]
 corner_radius_top_left = 5
@@ -25,6 +26,7 @@ grow_vertical = 2
 size_flags_horizontal = 6
 size_flags_vertical = 6
 mouse_filter = 1
+metadata/_edit_use_anchors_ = true
 
 [node name="DeckZone" type="Control" parent="MainUI" unique_id=263489053]
 custom_minimum_size = Vector2(120, 168)
@@ -79,6 +81,26 @@ grow_vertical = 2
 mouse_filter = 2
 theme = SubResource("Theme_0xm2m")
 color = Color(0.09302468, 0.030407105, 0.09302468, 1)
+
+[node name="CardSlot2" parent="MainUI" unique_id=2081405792 instance=ExtResource("2_he1p1")]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0
+anchor_top = 0.0
+offset_left = 1288.0
+offset_top = 570.0
+offset_right = 1408.0
+offset_bottom = 738.0
+
+[node name="CardSlot" parent="MainUI" unique_id=718168409 instance=ExtResource("2_he1p1")]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0
+anchor_top = 0.0
+offset_left = 644.0
+offset_top = 285.0
+offset_right = 764.0
+offset_bottom = 453.0
 
 [node name="CardManager" type="Node2D" parent="." unique_id=1700692630 node_paths=PackedStringArray("deck_zone", "discard_zone")]
 script = ExtResource("1_ctivo")

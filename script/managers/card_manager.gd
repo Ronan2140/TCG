@@ -15,7 +15,7 @@ var screen_size = Vector2.ZERO
 var hovering_card = null
 var current_hovered_slot = null
 var deck_pos = Vector2(100, 100)
-var hide_hand_delay_sec := 3.0
+var hide_hand_delay_sec := 1
 var hand_hide_timer: Timer = null
 var is_hand_shown := false
 var is_hovering_deck := false
@@ -130,6 +130,10 @@ func start_drag(card):
 	var card_center = card.global_position
 	off_set_x = card_center.x - get_global_mouse_position().x
 	off_set_y = card_center.y - get_global_mouse_position().y
+	
+	var prev_slot = card.get_meta("assigned_slot", null)
+	card.set_meta("previous_slot", prev_slot)
+	
 	release_card_slot(card)
 	
 	set_card_mouse_filter_recursive(card, Control.MOUSE_FILTER_IGNORE, Control.MOUSE_FILTER_IGNORE)
@@ -138,6 +142,7 @@ func start_drag(card):
 	print("Card selected: ", card.name)
 	highlight_card(card, true, 1.2)
 	_update_hand_hide_state()
+
 
 func undrag_card():
 	var dropped_card = selected_card
@@ -149,19 +154,32 @@ func undrag_card():
 	highlight_card(dropped_card, false)
 	
 	if current_hovered_slot != null:
-		dropped_card.global_position = current_hovered_slot.global_position
+		snap_card_to_slot(dropped_card, current_hovered_slot)
 		assign_card_to_slot(dropped_card, current_hovered_slot)
 		
-		# Reset visual state of the slot and clear the variable
+		dropped_card.set_meta("previous_slot", null)
+		
 		print("Carte déposée dans : ", current_hovered_slot.name)
 		current_hovered_slot = null
 		_update_hand_hide_state()
 		return
 
 	print("Carte relâchée hors d'un slot disponible.")
-	_organize_hand(HAND_Y_shown if is_hand_shown else HAND_Y_hidden)
+	
+	# Check if the card was previously in a slot
+	var prev_slot = dropped_card.get_meta("previous_slot", null)
+	if prev_slot != null and is_instance_valid(prev_slot):
+		print("Retour au slot precedent : ", prev_slot.name)
+		snap_card_to_slot(dropped_card, prev_slot)
+		assign_card_to_slot(dropped_card, prev_slot)
+		dropped_card.set_meta("previous_slot", null)
+	else:
+		# If no previous slot was found it means the card came from the hand
+		if not dropped_card in player_hand:
+			player_hand.append(dropped_card)
+		_organize_hand(HAND_Y_shown if is_hand_shown else HAND_Y_hidden)
+		
 	_update_hand_hide_state()
-
 func _on_card_hovered(card):
 	if selected_card != null and selected_card != card:
 		return
@@ -251,6 +269,30 @@ func assign_card_to_slot(card: Control, slot: Control) -> void:
 	slot.card_in_slot = true
 	slot.modulate = Color(1, 1, 1)
 	card.set_meta("assigned_slot", slot)
+	if card in player_hand:
+		player_hand.erase(card)
+		_organize_hand(HAND_Y_shown if is_hand_shown else HAND_Y_hidden)
+
+
+func snap_card_to_slot(card: Control, slot: Control) -> void:
+	if card == null or slot == null:
+		return
+
+	card.pivot_offset = card.size / 2.0
+	
+	var target_pos = slot.global_position + (slot.size - card.size) / 2.0
+	
+	if card.has_meta("move_tween"):
+		var old_tween = card.get_meta("move_tween")
+		if old_tween and old_tween.is_valid():
+			old_tween.kill()
+			
+	var tween = card.create_tween()
+	card.set_meta("move_tween", tween)
+	
+	tween.tween_property(card, "position", target_pos, 0.2).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+	
+	card.z_index = slot.z_index + 1
 
 
 func release_card_slot(card: Control) -> void:
