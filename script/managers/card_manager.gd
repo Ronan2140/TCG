@@ -211,7 +211,9 @@ func assign_card_to_slot(card: Control, slot: Control) -> void:
 
 
 func release_card_slot(card: Control) -> void:
-	var assigned_slot = card.get_meta("assigned_slot", null)
+	var assigned_slot = null
+	if card.has_meta("assigned_slot"):
+		assigned_slot = card.get_meta("assigned_slot", null)
 	if assigned_slot != null and is_instance_valid(assigned_slot):
 		assigned_slot.card_in_slot = false
 		assigned_slot.modulate = Color(1, 1, 1)
@@ -277,6 +279,8 @@ func draw_card():
 	if card_instance != null:
 		player_hand.append(card_instance)
 		_organize_hand(HAND_Y_shown if is_hand_shown else HAND_Y_hidden)
+		# set metadata slot to null for the new card
+		
 
 func _organize_hand(card_y = HAND_Y_hidden):
 	var count = player_hand.size()
