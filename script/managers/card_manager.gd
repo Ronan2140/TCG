@@ -5,7 +5,9 @@ var MAX_HAND_WIDTH = 0
 var HAND_CENTER_X = 0
 var HAND_Y_hidden = 0
 var HAND_Y_shown = 0
-@onready var deck_zone = %DeckZone
+@export var deck_zone: Control
+@export var discard_zone: Control
+
 var selected_card = null
 var off_set_x = 0.0
 var off_set_y = 0.0
@@ -16,6 +18,16 @@ var deck_pos = Vector2(100, 100)
 var hide_hand_delay_sec := 3.0
 var hand_hide_timer: Timer = null
 var is_hand_shown := false
+var is_hovering_deck := false
+var is_hovering_discard := false
+var base_deck_y := 0.0
+var base_discard_y := 0.0
+var zone_hide_offset := 84
+var base_deck_scale := Vector2.ONE
+var base_discard_scale := Vector2.ONE
+var deck_tween: Tween = null
+var discard_tween: Tween = null
+var zone_hover_scale := 1.08
 
 
 # region _ready and _process
@@ -23,7 +35,7 @@ func _ready() -> void:
 	screen_size = get_viewport_rect().size
 	MAX_HAND_WIDTH = screen_size.x - 2 * GameConfig.CARD_SIZE.x - 40
 	HAND_CENTER_X = screen_size.x / 2
-	# position a moitié visible
+	# Hidden and shown positions
 	HAND_Y_hidden = screen_size.y
 	HAND_Y_shown = screen_size.y - GameConfig.CARD_SIZE.y / 2 - 20
 
@@ -34,8 +46,25 @@ func _ready() -> void:
 	add_child(hand_hide_timer)
 
 	update_card_connections()
-	if deck_zone == null:
+	
+	if deck_zone != null:
+		# Save default Y position and connect hover signals
+		base_deck_y = deck_zone.position.y
+		base_deck_scale = deck_zone.scale
+		deck_zone.mouse_entered.connect(_on_deck_hovered)
+		deck_zone.mouse_exited.connect(_on_deck_unhovered)
+	else:
 		push_warning("DeckZone introuvable, utilisation de la position par defaut pour le draw.")
+
+	if discard_zone != null:
+		print("DiscardZone trouvé, position: ", discard_zone.position, '\n')
+		# Save default Y position and connect hover signals
+		base_discard_y = discard_zone.position.y
+		base_discard_scale = discard_zone.scale
+		discard_zone.mouse_entered.connect(_on_discard_hovered)
+		discard_zone.mouse_exited.connect(_on_discard_unhovered)
+	else:
+		push_warning("DiscardZone introuvable, utilisation de la position par defaut pour le draw.")
 	
 	# Load deck in PlayerData
 	load_deck(PlayerData.decks[PlayerData.selected_deck_index])
@@ -167,16 +196,30 @@ func highlight_card(card, hovered, scale_factor = 1.1):
 	# Lock pivot offset exactly to the center to prevent visual shifting on scale
 	card.pivot_offset = Vector2(60, 84)
 
+	if card.has_meta("hover_tween"):
+		var existing_tween = card.get_meta("hover_tween")
+		if existing_tween and existing_tween.is_valid():
+			existing_tween.kill()
+
+	var target_scale = card.get_meta("base_scale", Vector2(1, 1))
+	var target_modulate = Color(1, 1, 1, 1)
+
 	if hovered:
-		card.scale = card.get_meta("base_scale", Vector2(1, 1)) * scale_factor
 		card.z_index = 10
+		target_scale = card.get_meta("base_scale", Vector2(1, 1)) * scale_factor
+		target_modulate = Color(1.12, 1.12, 1.12, 1)
 	else:
-		card.scale = card.get_meta("base_scale", Vector2(1, 1))
 		card.z_index = 0
+
+	var hover_tween = card.create_tween()
+	hover_tween.set_parallel(true)
+	hover_tween.tween_property(card, "scale", target_scale, 0.15).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+	hover_tween.tween_property(card, "modulate", target_modulate, 0.15).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+	card.set_meta("hover_tween", hover_tween)
 
 
 func _update_hand_hide_state() -> void:
-	if selected_card != null or hovering_card != null:
+	if selected_card != null or hovering_card != null or is_hovering_deck or is_hovering_discard:
 		_cancel_hand_hide_timer()
 		if not is_hand_shown:
 			show_hand()
@@ -320,11 +363,76 @@ func _on_deck_zone_gui_input(event: InputEvent) -> void:
 		print("Deck clicked, drawing a card.", player_deck)
 		draw_card()
 
+func _on_deck_hovered() -> void:
+	is_hovering_deck = true
+	_apply_zone_hover(deck_zone, true, base_deck_scale, deck_tween)
+	_update_hand_hide_state()
 
-func hide_hand():
+func _on_deck_unhovered() -> void:
+	is_hovering_deck = false
+	_apply_zone_hover(deck_zone, false, base_deck_scale, deck_tween)
+	_update_hand_hide_state()
+
+func _on_discard_hovered() -> void:
+	is_hovering_discard = true
+	_apply_zone_hover(discard_zone, true, base_discard_scale, discard_tween)
+	_update_hand_hide_state()
+
+func _on_discard_unhovered() -> void:
+	is_hovering_discard = false
+	_apply_zone_hover(discard_zone, false, base_discard_scale, discard_tween)
+	_update_hand_hide_state()
+
+func _on_discard_zone_mouse_entered() -> void:
+	_on_discard_hovered()
+
+func _on_discard_zone_mouse_exited() -> void:
+	_on_discard_unhovered()
+
+func _apply_zone_hover(zone: Control, hovered: bool, base_scale: Vector2, tween: Tween) -> void:
+	if zone == null:
+		return
+
+	if tween != null and tween.is_valid():
+		tween.kill()
+
+	zone.pivot_offset = zone.size / 2.0
+	var target_scale = base_scale * zone_hover_scale if hovered else base_scale
+	var target_modulate = Color(1.18, 1.18, 1.18, 1.0) if hovered else Color(1, 1, 1, 1)
+	var zone_tween = zone.create_tween()
+	zone_tween.set_parallel(true)
+	zone_tween.tween_property(zone, "scale", target_scale, 0.15).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+	zone_tween.tween_property(zone, "modulate", target_modulate, 0.15).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+
+	if zone == deck_zone:
+		deck_tween = zone_tween
+	elif zone == discard_zone:
+		discard_tween = zone_tween
+	_update_hand_hide_state()
+
+func animate_zones(hide: bool) -> void:
+	var tween = create_tween().set_parallel(true)
+	
+	if deck_zone != null:
+		var target_y = base_deck_y + (zone_hide_offset if hide else 0.0)
+		tween.tween_property(deck_zone, "position:y", target_y, 0.4).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+		
+	if discard_zone != null:
+		var target_y = base_discard_y + (zone_hide_offset if hide else 0.0)
+		tween.tween_property(discard_zone, "position:y", target_y, 0.4).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+
+func hide_hand() -> void:
 	is_hand_shown = false
 	_organize_hand(HAND_Y_hidden)
+	animate_zones(true)
 
-func show_hand():
+func show_hand() -> void:
 	is_hand_shown = true
 	_organize_hand(HAND_Y_shown)
+	animate_zones(false)
+
+
+func _on_discard_zone_gui_input(event: InputEvent) -> void:
+	#  if left click
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
+		print("Discard zone clicked.")

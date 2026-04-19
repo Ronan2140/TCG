@@ -20,6 +20,7 @@ size_flags_vertical = 6
 mouse_filter = 2
 
 [node name="DiscardZone" type="Control" parent="MainUI" unique_id=1966967668]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 1
 anchors_preset = 2
@@ -97,5 +98,7 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 21
 text = "Nb cartes"
 
-[node name="CardManager" type="Node2D" parent="." unique_id=1700692630]
+[node name="CardManager" type="Node2D" parent="." unique_id=1700692630 node_paths=PackedStringArray("deck_zone", "discard_zone")]
 script = ExtResource("1_0xm2m")
+deck_zone = NodePath("../MainUI/DeckZone")
+discard_zone = NodePath("../MainUI/DiscardZone")
